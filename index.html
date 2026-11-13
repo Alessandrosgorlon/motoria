@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Biomomeccanica Strutturale dello Scheletro Umano — Masterclass</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-0:#05070d;
+    --bg-1:#0a0f1c;
+    --glass:rgba(255,255,255,0.045);
+    --glass-strong:rgba(255,255,255,0.08);
+    --stroke:rgba(255,255,255,0.12);
+    --stroke-hi:rgba(190,230,255,0.35);
+    --ink:#eef4fb;
+    --ink-dim:#9fb0c6;
+    --cyan:#7fdcff;
+    --ice:#b8f1ff;
+    --platinum:#dfe8f2;
+    --accent:#59c8ff;
+    --violet:#a78bfa;
+    --radius:22px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    font-family:'Inter',-apple-system,'SF Pro Display',sans-serif;
+    background:var(--bg-0);
+    color:var(--ink);
+    overflow:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* ---------- SFONDO ORGANICO PROFONDO ---------- */
+  .backdrop{position:fixed;inset:0;z-index:0;background:
+    radial-gradient(1200px 800px at 15% 10%, #0d1b33 0%, transparent 60%),
+    radial-gradient(1000px 700px at 85% 90%, #101b2e 0%, transparent 55%),
+    radial-gradient(700px 500px at 70% 20%, rgba(60,110,160,0.18) 0%, transparent 60%),
+    linear-gradient(160deg,#05070d 0%,#070b14 50%,#04060b 100%);}
+  .orb{position:fixed;border-radius:50%;filter:blur(90px);opacity:.5;z-index:0;animation:drift 26s ease-in-out infinite alternate}
+  .orb.a{width:520px;height:520px;top:-160px;left:-120px;background:radial-gradient(circle,rgba(89,200,255,.28),transparent 70%)}
+  .orb.b{width:620px;height:620px;bottom:-220px;right:-160px;background:radial-gradient(circle,rgba(167,139,250,.20),transparent 70%);animation-delay:-8s}
+  .orb.c{width:380px;height:380px;top:40%;left:55%;background:radial-gradient(circle,rgba(184,241,255,.14),transparent 70%);animation-delay:-16s}
+  @keyframes drift{from{transform:translate(0,0) scale(1)}to{transform:translate(60px,-40px) scale(1.12)}}
+  .grain{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.05;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E");}
+
+  /* ---------- SCAFO SLIDE ---------- */
+  .deck{position:relative;z-index:2;height:100vh;width:100vw}
+  .slide{
+    position:absolute;inset:0;display:none;flex-direction:column;
+    padding:56px 72px 96px;animation:slideIn .55s cubic-bezier(.22,.9,.3,1);
+  }
+  .slide.active{display:flex}
+  @keyframes slideIn{from{opacity:0;transform:translateY(18px) scale(.99)}to{opacity:1;transform:none}}
+
+  /* ---------- PANNELLI LIQUID GLASS ---------- */
+  .glass{
+    position:relative;
+    background:linear-gradient(135deg,rgba(255,255,255,.075),rgba(255,255,255,.03) 40%,rgba(255,255,255,.055));
+    backdrop-filter:blur(22px) saturate(1.5);
+    -webkit-backdrop-filter:blur(22px) saturate(1.5);
+    border-radius:var(--radius);
+    border:1px solid var(--stroke);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,.22) inset,
+      0 -1px 0 rgba(0,0,0,.25) inset,
+      0 24px 60px -18px rgba(0,0,0,.65),
+      0 60px 120px -40px rgba(0,0,0,.55);
+  }
+  .glass::before{ /* riflesso speculare superiore */
+    content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+    background:linear-gradient(115deg,rgba(255,255,255,.14) 0%,rgba(255,255,255,.02) 28%,transparent 45%);
+    mix-blend-mode:screen;
+  }
+  .glass::after{ /* bordo rifrangente */
+    content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;padding:1px;
+    background:linear-gradient(140deg,rgba(190,230,255,.45),rgba(255,255,255,.06) 30%,transparent 55%,rgba(167,139,250,.25));
+    -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor;mask-composite:exclude;
+  }
+  .pad{padding:28px 30px}
+
+  /* ---------- TIPOGRAFIA ---------- */
+  .kicker{
+    font-size:12px;font-weight:700;letter-spacing:.34em;text-transform:uppercase;
+    color:var(--cyan);display:flex;align-items:center;gap:14px;margin-bottom:18px;
+  }
+  .kicker::before{content:"";width:34px;height:1px;background:linear-gradient(90deg,var(--cyan),transparent)}
+  h1{font-size:clamp(34px,4.4vw,58px);font-weight:800;letter-spacing:-.02em;line-height:1.06}
+  h2{font-size:clamp(24px,2.6vw,36px);font-weight:800;letter-spacing:-.015em;margin-bottom:6px}
+  h2 .up{text-transform:uppercase}
+  .sub{color:var(--ink-dim);font-size:15px;font-weight:400;line-height:1.55;max-width:900px}
+  .small{font-size:12.5px;color:var(--ink-dim);line-height:1.5}
+
+  /* ---------- COMPONENTI ---------- */
+  .grid{display:grid;gap:18px}
+  .g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+  .num{font-size:clamp(40px,4.6vw,64px);font-weight:800;letter-spacing:-.03em;line-height:1;
+    background:linear-gradient(180deg,#fff 0%,var(--ice) 55%,var(--accent) 120%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;}
+  .metric-label{font-size:11px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-dim);margin-top:10px}
+  .tag{display:inline-flex;align-items:center;gap:8px;padding:7px 14px;border-radius:999px;
+    background:rgba(127,220,255,.08);border:1px solid rgba(127,220,255,.25);
+    font-size:12px;font-weight:600;color:var(--ice);letter-spacing:.06em}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan)}
+  .list{list-style:none;display:flex;flex-direction:column;gap:12px}
+  .list li{display:flex;gap:12px;font-size:14.5px;line-height:1.5;color:#d7e2ef}
+  .list li b{color:#fff}
+  .list li::before{content:"";flex:0 0 6px;height:6px;border-radius:50%;margin-top:8px;
+    background:linear-gradient(135deg,var(--cyan),var(--violet));box-shadow:0 0 8px rgba(127,220,255,.6)}
+
+  /* tabella comparativa */
+  table{width:100%;border-collapse:separate;border-spacing:0;font-size:13.5px}
+  th{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--cyan);text-align:left;
+    padding:12px 16px;border-bottom:1px solid var(--stroke-hi);font-weight:700}
+  td{padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.06);color:#d7e2ef;vertical-align:top;line-height:1.45}
+  tr:last-child td{border-bottom:none}
+  td.k{color:#fff;font-weight:600;white-space:nowrap}
+
+  /* barra di progresso + nav */
+  .progress{position:fixed;left:0;bottom:0;height:3px;z-index:10;
+    background:linear-gradient(90deg,var(--accent),var(--violet));box-shadow:0 0 12px rgba(89,200,255,.8);
+    transition:width .4s ease}
+  .hud{position:fixed;right:28px;bottom:20px;z-index:10;display:flex;align-items:center;gap:14px;
+    padding:10px 16px;border-radius:999px;font-size:13px;font-weight:600;color:var(--ink-dim)}
+  .hud button{
+    width:34px;height:34px;border-radius:50%;border:1px solid var(--stroke);cursor:pointer;
+    background:rgba(255,255,255,.06);color:var(--ink);font-size:15px;display:grid;place-items:center;
+    transition:.2s}
+  .hud button:hover{background:rgba(127,220,255,.18);border-color:var(--stroke-hi)}
+  .brand{position:fixed;left:28px;bottom:24px;z-index:10;font-size:11px;letter-spacing:.28em;
+    text-transform:uppercase;color:rgba(255,255,255,.28);font-weight:600}
+
+  .footnote{margin-top:auto;padding-top:18px;font-size:11.5px;color:rgba(255,255,255,.34);letter-spacing:.04em}
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:26px;flex:1;min-height:0;align-content:start}
+  .bento{display:grid;grid-template-columns:repeat(12,1fr);gap:18px;flex:1;min-height:0}
+  .head{margin-bottom:26px}
+  .femur{font-size:12px;color:var(--ink-dim)}
+  .chip-row{display:flex;flex-wrap:wrap;gap:10px}
+</style>
+</head>
+<body>
+<div class="backdrop"></div>
+<div class="orb a"></div><div class="orb b"></div><div class="orb c"></div>
+<div class="grain"></div>
+
+<div class="deck" id="deck">
+
+<!-- ══════════ SLIDE 1 · COPERTINA ══════════ -->
+<section class="slide active" style="justify-content:center">
+  <div style="max-width:1000px">
+    <div class="kicker">Masterclass · Osteologia &amp; Biomeccanica</div>
+    <h1>Biomomeccanica strutturale e morfologica<br>dello <span style="background:linear-gradient(90deg,var(--ice),var(--accent) 60%,var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent">scheletro umano</span></h1>
+    <p class="sub" style="margin-top:22px;font-size:17px">Scheletro Assiale vs Scheletro Appendicolare e classificazione osteologica: analisi dei carichi, leve ossee di I, II e III genere, tensioni torsionali e moduli di elasticità del tessuto osseo.</p>
+    <div class="chip-row" style="margin-top:34px">
+      <span class="tag"><span class="dot"></span>206 OSSA</span>
+      <span class="tag"><span class="dot"></span>ASSIALE · 80</span>
+      <span class="tag"><span class="dot"></span>APPENDICOLARE · 126</span>
+      <span class="tag"><span class="dot"></span>LEVE · I / II / III GENERE</span>
+    </div>
+  </div>
+  <div class="footnote">Tessuto osseo = materiale anisotropo, viscoelastico, in continuo rimodellamento (legge di Wolff)</div>
+</section>
+
+<!-- ══════════ SLIDE 2 · INTRODUZIONE SISTEMICA ══════════ -->
+<section class="slide">
+  <div class="head">
+    <div class="kicker">01 · Introduzione sistemica</div>
+    <h2>Lo scheletro come <span class="up">sistema strutturale</span></h2>
+    <p class="sub">Non un semplice impalcato: un sistema dinamico che integra funzione meccanica, metabolica ed emopoietica, progettato per resistere a carichi multipli direzionali.</p>
+  </div>
+  <div class="bento" style="grid-template-rows:1fr auto">
+    <div class="grid g4" style="grid-column:1/-1;align-content:start">
+      <div class="glass pad"><div class="num">206</div><div class="metric-label">Ossa nell'adulto</div><p class="small" style="margin-top:8px">270 alla nascita: fusione progressiva riducono il conteggio.</p></div>
+      <div class="glass pad"><div class="num">5</div><div class="metric-label">Funzioni primarie</div><p class="small" style="margin-top:8px">Supporto, protezione, movimento, emopoiesi, riserva minerale (Ca²⁺/PO₄³⁻).</p></div>
+      <div class="glass pad"><div class="num">~30%</div><div class="metric-label">Componente organica</div><p class="small" style="margin-top:8px">Collagene di tipo I: dona flessibilità e tenacità a trazione.</p></div>
+      <div class="glass pad"><div class="num">~70%</div><div class="metric-label">Componente inorganica</div><p class="small" style="margin-top:8px">Idrossiapatite Ca₁₀(PO₄)₆(OH)₂: dona rigidità e resistenza a compressione.</p></div>
+    </div>
+    <div class="glass pad" style="grid-column:1/-1">
+      <ul class="list" style="flex-direction:row;gap:34px">
+        <li><span><b>Compresso</b> → carichi assiali (colonna, femore in stazione eretta)</span></li>
+        <li><span><b>Flesso</b> → momenti flettenti (curvature fisiologiche vertebrali)</span></li>
+        <li><span><b>Torto</b> → tensioni torsionali (tibia in cambi di direzione)</span></li>
+        <li><span><b>Taglio</b> → sollecitazione di taglio (epifisi prossimali)</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ SLIDE 3 · ARCHITETTURA DUALE ══════════ -->
+<section class="slide">
+  <div class="head">
+    <div class="kicker">02 · Architettura duale</div>
+    <h2>Due sottosistemi, <span class="up">una logica strutturale</span></h2>
+    <p class="sub">La suddivisione non è topografica ma funzionale: l'asse protegge e sostiene; l'appendice si muove e manipola.</p>
+  </div>
+  <div class="split">
+    <div class="glass pad" style="display:flex;flex-direction:column;gap:16px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <h2 style="font-size:22px">Scheletro Assiale</h2><span class="tag">80 OSSA</span>
+      </div>
+      <div class="num" style="font-size:44px">39%</div>
+      <ul class="list">
+        <li><span><b>Cranio</b> (22 + 6 ossicina uditive) — capsula protettiva encefalo</span></li>
+        <li><span><b>Ioide</b> — apparecchio sospensore della lingua</span></li>
+        <li><span><b>Colonna vertebrale</b> (26) — trave segmentata curva</span></li>
+        <li><span><b>Torace</b> (25: 24 coste + sterno) — gabbia pressurizzabile</span></li>
+      </ul>
+      <p class="small" style="margin-top:auto">Missione: <b style="color:#fff">asse portante verticale</b>, protezione di SNC, midollo, cuore e polmoni.</p>
+    </div>
+    <div class="glass pad" style="display:flex;flex-direction:column;gap:16px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <h2 style="font-size:22px">Scheletro Appendicolare</h2><span class="tag">126 OSSA</span>
+      </div>
+      <div class="num" style="font-size:44px">61%</div>
+      <ul class="list">
+        <li><span><b>Cingolo scapolo-omerale</b> (4: clavicola + scapola ×2) — sospensione mobile dell'arto superiore</span></li>
+        <li><span><b>Arto superiore</b> (60) — braccio, avambraccio, mano</span></li>
+        <li><span><b>Cingolo pelvico</b> (2: ossa dell'anca) — trasmissione carico tronco → arti</span></li>
+        <li><span><b>Arto inferiore</b> (60) — femore, tibia/perone, piede</span></li>
+      </ul>
+      <p class="small" style="margin-top:auto">Missione: <b style="color:#fff">cinematica e prensilità</b>, locomozione e interazione con l'ambiente.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ SLIDE 4 · CRANIO ══════════ -->
+<section class="slide">
+  <div class="head">
+    <div class="kicker">03 · Scheletro assiale — il cranio</div>
+    <h2>Il cranio: <span class="up">cupola a compressione</span></h2>
+    <p class="sub">Struttura a guscio sottile (thin-shell): distribuisce i carichi di impatto lungo archi di forza, minimizzando la tensione locale.</p>
+  </div>
+  <div class="split" style="grid-template-columns:1.1fr .9fr">
+    <div class="glass pad">
+      <table>
+        <tr><th>Distretto</th><th>Composizione</th><th>Funzione biomeccanica</th></tr>
+        <tr><td class="k">Neurocranio</td><td>8 ossa piatte (frontale, 2 parietali, 2 temporali, occipitale, sfenoide, etmoide)</td><td>Guscio rigido: protezione statica dell'encefalo</td></tr>
+        <tr><td class="k">Splancnocranio</td><td>14 ossa (mascellari, zigomatiche, palatine, nasali, lacrimali, vomere, cornetti, mandibola)</td><td>Impalcato di supporto della faccia e della masticazione</td></tr>
+        <tr><td class="k">Suture</td><td>Articolazioni fibrose immobili</td><td>Assorbimento micro-deformazioni + crescita cranica</td></tr>
+      </table>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:18px">
+      <div class="glass pad"><div class="num" style="font-size:46px">22+6</div><div class="metric-label">Ossa + ossicina uditive (martello, incudine, staffa)</div></div>
+      <div class="glass pad">
+        <ul class="list">
+          <li><span><b>Archi di forza</b>: frontale → zigomatico → mascellare</span></li>
+          <li><span><b>Sinus paranasali</b>: alleggerimento strutturale (travi a traliccio)</span></li>
+          <li><span><b>ATM</b>: unica articolazione bilanciata bilaterale del corpo</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ SLIDE 5 · COLONNA ══════════ -->
+<section class="slide">
+  <div class="head">
+    <div class="kicker">04 · Scheletro assiale — colonna vertebrale</div>
+    <h2>La colonna: <span class="up">trave segmentata curva</span></h2>
+    <p class="sub">Serie di segmenti mobili (unità funzionale: 2 vertebre + disco) che trasforma una colonna rigida impossibile in una struttura flessibile ad alta capacità di carico.</p>
+  </div>
+  <div class="bento" style="grid-template-rows:1fr auto">
+    <div class="grid g4" style="grid-column:1/-1;align-content:start">
+      <div class="glass pad"><div class="num">7</div><div class="metric-label">Vertebre cervicali · lordosi cervicale</div><p class="small" style="margin-top:8px">Atlante (C1) ed epistrofeo (C2): rotazione cefalica. Foro traversario: passaggio arterioso.</p></div>
+      <div class="glass pad"><div class="num">12</div><div class="metric-label">Vertebre toraciche · cifosi</div><p class="small" style="margin-top:8px">Facet articolari coronali: rotazione privilegiata; connessione costale.</p></div>
+      <div class="glass pad"><div class="num">5</div><div class="metric-label">Vertebre lombari · lordosi lombare</div><p class="small" style="margin-top:8px">Corpi massicci: zona di massimo carico assiale. Facet sagittali: flessione/estensione.</p></div>
+      <div class="glass pad"><div class="num">9</div><div class="metric-label">Sacrococcigee (fuse: sacro + coccige)</div><p class="small" style="margin-top:8px">Chiave di volta del bacino: trasmissione carico → arti inferiori.</p></div>
+    </div>
+    <div class="glass pad" style="grid-column:1/-1">
+      <ul class="list" style="flex-direction:row;gap:34px">
+        <li><span><b>Disci intervertebrali</b>: nucleo polposo (80% H₂O) = ammortizzatore idraulico; anello fibroso = contenimento tensile</span></li>
+        <li><span><b>Curvature fisiologiche</b>: convergono i momenti flettenti in carichi di compressione</span></li>
+        <li><span><b>Legamento longitudinale anteriore/posteriore</b>: stabilizzazione passiva in tensione</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ SLIDE 6 · TORACE ══════════ -->
+<section class="slide">
+  <div class="head">
+    <div class="kicker">05 · Scheletro assiale — gabbia toracica</div>
+    <h2>Il torace: <span class="up">gabbia deformabile</span></h2>
+    <p class="sub">Struttura ibrida: rigida quanto basta per proteggere, elastica quanto serve per la ventilazione. Un caso di studio di progettazione a compromesso.</p>
+  </div>
+  <div class="split">
+    <div class="glass pad">
+      <table>
+        <tr><th>Elemento</th><th>Caratteristica</th></tr>
+        <tr><td class="k">24 coste</td><td>12 paia: 7 vere (sterno), 3 finte (cartilagine congiunta), 2 fluttuanti</td></tr>
+        <tr><td class="k">Sterno</td><td>Manubrio + corpo + processo xifoideo: punto di fusione anteriore</td></tr>
+        <tr><td class="k">Cartilagini costali</td><td>Smorzatori elastici: consentono l'escursione toracica</td></tr>
+        <tr><td class="k">Articolazioni</td><td>Costovertebrali e costotransversarie: perno di rotazione della costa</td></tr>
+      </table>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:18px">
+      <div class="glass pad" style="display:flex;gap:30px;align-items:center">
+        <div><div class="num" style="font-size:46px">25</div><div class="metric-label">Ossa del torace</div></div>
+        <div><div class="num" style="font-size:46px">~500<span style="font-size:22px"> mL</span></div><div class="metric-label">Volume corrente abilitato dall'escursione costale</div></div>
+      </div>
+      <div class="glass pad">
+        <ul class="list">
+          <li><span><b>Meccanica ventilatoria</b>: elevazione delle coste (muscoli intercostali) ↑ volume, ↓ pressione intrapulmonare</span></li>
+          <li><span><b>Protezione dinamica</b>: deformazione controllata assorbe urti senza frattura (tolleranza strutturale)</span></li>
+          <li><span><b>Coppia sterno-clavicolare</b>: unica giunzione assiale→appendicolare superiore</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ SLIDE 7 · CINGOLI ══════════ -->
+<section class="slide">
+  <div class="head">
+    <div class="kicker">06 · Scheletro appendicolare — i cingoli</div>
+    <h2>I cingoli: <span class="up">giunzioni strategiche</span></h2>
+    <p class="sub">Interfacce tra asse e arti. Il cingolo superiore privilegia mobilità; il cingolo inferiore privilegia stabilità. Due soluzioni opposte allo stesso problema di trasferimento di carico.</p>
+  </div>
+  <div class="split">
+    <div class="glass pad" style="display:flex;flex-direction:column;gap:14px">
+      <span class="tag" style="align-self:flex-start"><span class="dot"></span>CINGOLO SCAPULO-OMERALE · 4 OSSA</span>
+      <h2 style="font-size:20px">Sospensione muscolare mobile</h2>
+      <ul class="list">
+        <li><span><b>Clavicola</b>: montante compresso a "S" — unica connessione ossea con lo scheletro assiale (art. sternoclavicolare)</span></li>
+        <li><span><b>Scapola</b>: piattaforma gliding sul torace, tenuta solo da muscoli (scapulotoracica)</span></li>
+        <li><span>Trade-off: <b>massima escursione</b> dell'arto, <b>minima stabilità intrinseca</b> (lussazione gleno-omerale = più frequente)</span></li>
+      </ul>
+    </div>
+    <div class="glass pad" style="display:flex;flex-direction:column;gap:14px">
+      <span class="tag" style="align-self:flex-start"><span class="dot" style="background:var(--violet);box-shadow:0 0 10px var(--violet)"></span>CINGOLO PELVICO · 2 OSSA</span>
+      <h2 style="font-size:20px">Arco rigido di trasmissione</h2>
+      <ul class="list">
+        <li><span><b>Ossa dell'anca</b>: fusione ileo + ischio + pube (cartilagine a Y) — arco pelvico chiuso</span></li>
+        <li><span><b>Sacro</b> = chiave di volta: carico del tronco → articolazioni sacro-iliache → anche → femori</span></li>
+        <li><span>Trade-off: <b>trasferimento di carico efficiente</b> in bipede, <b>canale del parto</b> come vincolo morfologico</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ SLIDE 8 · ARTI ══════════ -->
+<section class="slide">
+  <div class="head">
+    <div class="kicker">07 · Scheletro appendicolare — gli arti</div>
+    <h2>Gli arti: <span class="up">segmenti in serie</span></h2>
+    <p class="sub">Architettura omologa 1-2-molti: segmento prossimale singolo, doppio intermedio, distale numerico. Ogni segmento è una leva; ogni articolazione, un perno cinematico.</p>
+  </div>
+  <div class="grid g2" style="flex:1;align-content:start">
+    <div class="glass pad">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <h2 style="font-size:20px">Arto superiore · 60 ossa</h2><span class="tag">MANIPOLAZIONE</span>
+      </div>
+      <table>
+        <tr><td class="k">Braccio</td><td>Omero (1) — leva lunga del deltoide e del bicipite</td></tr>
+        <tr><td class="k">Avambraccio</td><td>Radio + ulna (2) — pronazione/supinazione: torsione assiale controllata</td></tr>
+        <tr><td class="k">Mano</td><td>8 carpo + 5 metacarpo + 14 falangi (27) — prensilità a 3 pinze</td></tr>
+      </table>
+    </div>
+    <div class="glass pad">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <h2 style="font-size:20px">Arto inferiore · 60 ossa</h2><span class="tag">LOCOMOZIONE</span>
+      </div>
+      <table>
+        <tr><td class="k">Coscia</td><td>Femore (1) — osso più lungo e più resistente: carico ~3-4× peso corporeo in corsa</td></tr>
+        <tr><td class="k">Gamba</td><td>Tibia (portante) + perone (tensile) (2) — tibia = 2ª più lunga</td></tr>
+        <tr><td class="k">Piede</td><td>7 tarso + 5 metatarso + 14 falangi (26) — volta a triplice arco: smorzatore</td></tr>
+      </table>
+    </div>
+  </div>
+  <div class="glass pad" style="margin-top:18px">
+    <p class="small" style="font-size:13px"><b style="color:#fff">Rotula (ossa sesamoidi)</b>: ossificazione intratendinea che aumenta il braccio di leva del quadricipite — esempio di adattamento biomeccanico funzionale.</p>
+  </div>
+</section>
+
+<!-- ══════════ SLIDE 9 · MORFOLOGIA ══════════ -->
+<section class="slide">
+  <div class="head">
+    <div class="kicker">08 · Analisi morfologica</div>
+    <h2>Classificazione osteologica: <span class="up">la forma segue il carico</span></h2>
+    <p class="sub">Quattro famiglie morfologiche, ciascuna ottimizzata per un regime di sollecitazione dominante.</p>
+  </div>
+  <div class="grid g4" style="flex:1;align-content:start">
+    <div class="glass pad">
+      <div class="tag" style="margin-bottom:14px"><span class="dot"></span>LUNGHE</div>
+      <div class="num" style="font-size:40px">3</div>
+      <div class="metric-label">Zone: diafisi + 2 epifisi</div>
+      <ul class="list" style="margin-top:14px">
+        <li><span><b>Diafisi</b>: tubo cavo compatto → massimo I di flessione con minima massa (I = πr⁴ ideale)</span></li>
+        <li><span><b>Metafisi/epifisi</b>: osso spugnoso → distribuzione dei carichi articolari</span></li>
+        <li><span>Femore, omero, falangi</span></li>
+      </ul>
+    </div>
+    <div class="glass pad">
+      <div class="tag" style="margin-bottom:14px"><span class="dot"></span>CORTE</div>
+      <div class="num" style="font-size:40px">≈1:1</div>
+      <div class="metric-label">Proporzioni L×L×A</div>
+      <ul class="list" style="margin-top:14px">
+        <li><span>Struttura isodiametrica: <b>compressione idrostatica</b> e distribuzione multi-direzionale</span></li>
+        <li><span>Guscio sottile compatto + nucleo spugnoso (trabecolato)</span></li>
+        <li><span>Vertebre, carpo, tarso</span></li>
+      </ul>
+    </div>
+    <div class="glass pad">
+      <div class="tag" style="margin-bottom:14px"><span class="dot"></span>PIATTE</div>
+      <div class="num" style="font-size:40px">2</div>
+      <div class="metric-label">Tavole compatte + diploe</div>
+      <ul class="list" style="margin-top:14px">
+        <li><span>Sandwich strutturale: rigidità a flessione con massa minima (principio del pannello a nido d'ape)</span></li>
+        <li><span>Protezione a guscio + ampia superficie di inserzione muscolare</span></li>
+        <li><span>Parie craniche, scapola, sterno, coste, ileo</span></li>
+      </ul>
+    </div>
+    <div class="glass pad">
+      <div class="tag" style="margin-bottom:14px"><span class="dot"></span>IRREGOLARI &amp; SESAMOIDI</div>
+      <div class="num" style="font-size:40px">∞</div>
+      <div class="metric-label">Forme specializzate</div>
+      <ul class="list" style="margin-top:14px">
+        <li><span>Vertebre, sacro, sfenoide, mandibola: geometrie ad-hoc per carichi misti</span></li>
+        <li><span><b>Sesamoidi</b> (rotula): deviatori tendinei e amplificatori di leva</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ SLIDE 10 · TESSUTO OSSEO ══════════ -->
+<section class="slide">
+  <div class="head">
+    <div class="kicker">09 · Materiali &amp; moduli elastici</div>
+    <h2>Osso compatto vs <span class="up">osso spugnoso</span></h2>
+    <p class="sub">Due architetture dello stesso composito: il compatto è il materiale pieno; lo spugnoso è una struttura a celle (porosità 50-90%) ottimizzata per assorbimento energetico.</p>
+  </div>
+  <div class="split">
+    <div class="glass pad">
+      <table>
+        <tr><th>Parametro</th><th>Osso compatto</th><th>Osso spugnoso</th></tr>
+        <tr><td class="k">Porosità</td><td>5–10%</td><td>50–90%</td></tr>
+        <tr><td class="k">Modulo E (Young)</td><td>17–20 GPa</td><td>0,1–4,5 GPa (anisotropo, dipende dalla densità)</td></tr>
+        <tr><td class="k">Resistenza a compressione</td><td>130–200 MPa</td><td>2–60 MPa</td></tr>
+        <tr><td class="k">Densità apparente</td><td>1,8–1,9 g/cm³</td><td>0,1–1,0 g/cm³</td></tr>
+        <tr><td class="k">Ruolo</td><td>Rigidità, trasmissione carico, leva</td><td>Ammortizzazione, trasferimento articolare, metabolismo Ca</td></tr>
+        <tr><td class="k">Architettura</td><td>Osteoni (sistemi di Havers) concentrici</td><td>Trabecole orientate lungo le traiettorie di carico (Wolff)</td></tr>
+      </table>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:18px">
+      <div class="glass pad">
+        <div class="metric-label" style="margin-top:0">Anisotropia · esempio femore prossimale</div>
+        <div class="num" style="font-size:40px;margin-top:8px">~10×</div>
+        <p class="small" style="margin-top:8px">Rapporto tra rigidezza lungo l'asse di carico prevalente e direzione trasversale: le trabecole del collo del femore si allineano alle isostatiche di compressione e trazione.</p>
+      </div>
+      <div class="glass pad">
+        <ul class="list">
+          <li><span><b>Viscoelasticità</b>: il comportamento dipende dalla velocità di deformazione (più rapido = più rigido e fragile)</span></li>
+          <li><span><b>Anisotropia</b>: proprietà dipendenti dalla direzione del carico</span></li>
+          <li><span><b>Rimodellamento</b>: osteoblasti/osteoclasti adattano la massa alla domanda meccanica</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ SLIDE 11 · LEVE ══════════ -->
+<section class="slide">
+  <div class="head">
+    <div class="kicker">10 · Analisi dei carichi</div>
+    <h2>Le leve ossee: <span class="up">I, II e III genere</span></h2>
+    <p class="sub">Ogni articolazione è un fulcro; ogni osso, un braccio rigido; ogni muscolo, un attuatore. Nel corpo prevale la terza specie: forza scambiata per velocità e ampiezza.</p>
+  </div>
+  <div class="grid g3" style="flex:1;align-content:start">
+    <div class="glass pad">
+      <div class="num" style="font-size:52px">I</div>
+      <div class="metric-label">Prima specie · bilanciere</div>
+      <p class="small" style="margin-top:12px">Fulcro <b style="color:#fff">tra</b> forza e resistenza.</p>
+      <ul class="list" style="margin-top:14px">
+        <li><span>Articolazione atlanto-occipitale: muscoli posteriori del collo vs peso del capo</span></li>
+        <li><span>Equilibrio posturale del capo</span></li>
+        <li><span>Vantaggio: equilibrio preciso, vantaggio meccanico variabile</span></li>
+      </ul>
+    </div>
+    <div class="glass pad">
+      <div class="num" style="font-size:52px">II</div>
+      <div class="metric-label">Seconda specie · carriola</div>
+      <p class="small" style="margin-top:12px">Resistenza <b style="color:#fff">tra</b> fulcro e forza. Sempre vantaggiosa (FM &gt; 1).</p>
+      <ul class="list" style="margin-top:14px">
+        <li><span>Elevazione del tallone: gastrocnemio/soleo sul fulcro metatarso-falangeo</span></li>
+        <li><span>Propulsione durante il passo</span></li>
+        <li><span>Rara nel corpo umano</span></li>
+      </ul>
+    </div>
+    <div class="glass pad" style="background:linear-gradient(135deg,rgba(127,220,255,.10),rgba(167,139,250,.06))">
+      <div class="num" style="font-size:52px">III</div>
+      <div class="metric-label">Terza specie · dominante</div>
+      <p class="small" style="margin-top:12px">Forza <b style="color:#fff">tra</b> fulcro e resistenza. Sempre sfavorevole (FM &lt; 1).</p>
+      <ul class="list" style="margin-top:14px">
+        <li><span>Flessione dell'avambraccio: bicipite inserito vicino al gomito</span></li>
+        <li><span>FM ≈ 0,1 → forza muscolare ~10× il carico sollevato</span></li>
+        <li><span>Scambio: <b>velocità e ampiezza</b> di movimento distale (precisione motoria)</span></li>
+      </ul>
+    </div>
+  </div>
+  <div class="glass pad" style="margin-top:18px">
+    <p class="small" style="font-size:13px"><b style="color:#fff">Torsione</b>: la tibia nei cambi di direzione subisce coppie torsionali; la disposizione elicoidale del collagene negli osteoni ne ottimizza la resistenza. <b style="color:#fff">Flessione</b>: il tubo cavo della diafisi concentra la massa lontano dall'asse neutro (I ↑ a parità di area).</p>
+  </div>
+</section>
+
+<!-- ══════════ SLIDE 12 · SINTESI ══════════ -->
+<section class="slide">
+  <div class="head">
+    <div class="kicker">11 · Sintesi biomeccanica finale</div>
+    <h2>La logica del progetto osseo: <span class="up">massima funzione, minima massa</span></h2>
+  </div>
+  <div class="bento" style="grid-template-rows:1fr auto">
+    <div class="grid g3" style="grid-column:1/-1;align-content:start">
+      <div class="glass pad">
+        <div class="metric-label" style="margin-top:0">Assiale</div>
+        <h2 style="font-size:19px;margin-top:8px">Protegge &amp; sostiene</h2>
+        <p class="small" style="margin-top:10px">Gusci (cranio), travi segmentate (colonna), gabbie deformabili (torace): soluzioni per compressione e protezione.</p>
+      </div>
+      <div class="glass pad">
+        <div class="metric-label" style="margin-top:0">Appendicolare</div>
+        <h2 style="font-size:19px;margin-top:8px">Si muove &amp; manipola</h2>
+        <p class="small" style="margin-top:10px">Cingoli specializzati (mobilità vs stabilità), segmenti in serie, leve di III genere per velocità e precisione.</p>
+      </div>
+      <div class="glass pad">
+        <div class="metric-label" style="margin-top:0">Morfologia</div>
+        <h2 style="font-size:19px;margin-top:8px">La forma segue il carico</h2>
+        <p class="small" style="margin-top:10px">Lunghe = flessione/torsione; corte = compressione multi-direzionale; piatte = protezione a sandwich; sesamoidi = leva amplificata.</p>
+      </div>
+    </div>
+    <div class="glass pad" style="grid-column:1/-1;display:flex;align-items:center;gap:40px">
+      <div><div class="num" style="font-size:52px">Wolff</div><div class="metric-label">Legge di trasformazione funzionale</div></div>
+      <p class="sub" style="font-size:14.5px;max-width:none">L'osso è un materiale vivente che si autoprogetta: deposita tessuto dove la tensione cresce, lo riassorbe dove scompare. Compatto per rigidità, spugnoso per assorbimento, anisotropo per efficienza — lo scheletro è l'ingegneria strutturale resa biologica.</p>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<div class="progress" id="progress"></div>
+<div class="brand">Osteologia · Biomeccanica</div>
+<div class="hud glass">
+  <button id="prev" aria-label="Precedente">‹</button>
+  <span id="counter">1 / 12</span>
+  <button id="next" aria-label="Successiva">›</button>
+</div>
+
+<script>
+  const slides=[...document.querySelectorAll('.slide')];
+  let i=0;
+  const counter=document.getElementById('counter'),progress=document.getElementById('progress');
+  function show(n){
+    slides[i].classList.remove('active');
+    i=(n+slides.length)%slides.length;
+    slides[i].classList.add('active');
+    counter.textContent=(i+1)+' / '+slides.length;
+    progress.style.width=((i+1)/slides.length*100)+'%';
+  }
+  document.getElementById('next').onclick=()=>show(i+1);
+  document.getElementById('prev').onclick=()=>show(i-1);
+  addEventListener('keydown',e=>{
+    if(e.key==='ArrowRight'||e.key===' '||e.key==='PageDown')show(i+1);
+    if(e.key==='ArrowLeft'||e.key==='PageUp')show(i-1);
+    if(e.key==='Home')show(0);
+    if(e.key==='End')show(slides.length-1);
+  });
+  progress.style.width=(1/slides.length*100)+'%';
+</script>
+</body>
+</html>
